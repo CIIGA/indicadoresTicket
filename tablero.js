@@ -87,12 +87,16 @@ $(function () {
 
   // Agregar evento de cambio para el selector de asesor
   $("#asesor").change(function () {
+    rangof = $("#rangof").val();
+    categoria = $("#categoria").val();
     asesor = $(this).val();
     updateChart(rangof, asesor, categoria);
   });
 
   // Agregar evento de cambio para el selector de categoría
   $("#categoria").change(function () {
+    rangof = $("#rangof").val();
+    asesor = $("#asesor").val();
     categoria = $(this).val();
     updateChart(rangof, asesor, categoria);
   });
@@ -108,7 +112,7 @@ $(function () {
     $("#reporte").on("click", function () {
       // Obtener el valor de rangof
       var rangof = $("#rangof").val();
-  
+
       // Mostrar SweetAlert de descargando
       Swal.fire({
         title: "Tu reporte se esta descargando",
@@ -117,14 +121,14 @@ $(function () {
         showConfirmButton: true,
         allowOutsideClick: false,
       });
-  
+
       // Abrir una nueva ventana para manejar la descarga del archivo
-      var downloadWindow = window.open("reporte.php?rangof=" + rangof, "_blank");
-  
-      
+      var downloadWindow = window.open(
+        "reporte.php?rangof=" + rangof,
+        "_blank"
+      );
     });
   });
-  
 
   $('input[id="rangof"]').daterangepicker({
     autoUpdateInput: false,
