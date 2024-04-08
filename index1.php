@@ -1,20 +1,12 @@
 <?php
 require "cnx.php";
-$sql_estado = sqlsrv_query($cnx, "select te.id_tipo_estado,te.nombre from ticket as t
-inner join tipo_estado as te on t.id_tipo_estado=te.id_tipo_estado where t.estatus <> 1
-group by te.id_tipo_estado,te.nombre
+$sql_asesor = sqlsrv_query($cnx, "select a.id_asesor,a.nombre from ticket as t
+inner join asesor as a on t.id_asesor=a.id_asesor
+group by a.id_asesor,a.nombre
 ");
 $sql_categoria = sqlsrv_query($cnx, "select c.id_categoria,c.nombre from ticket as t
-inner join categoria as c on t.id_categoria=c.id_categoria where t.estatus <> 1
+inner join categoria as c on t.id_categoria=c.id_categoria
 group by c.id_categoria,c.nombre
-");
-$sql_usuario = sqlsrv_query($cnx, "select u.id_usuario,u.nombre from ticket as t
-inner join usuario as u on t.id_usuario=u.id_usuario where t.estatus <> 1
-group by u.id_usuario,u.nombre
-");
-$sql_plaza = sqlsrv_query($cnx, "select p.id_plaza,p.nombre from ticket as t
-inner join plaza as p on t.id_plaza=p.id_plaza where t.estatus <> 1
-group by p.id_plaza,p.nombre
 ");
 
 
@@ -73,49 +65,24 @@ group by p.id_plaza,p.nombre
             <div class="container-fluid">
                 <!-- Filters Section -->
                 <div class="row mb-3">
-                    <div class="col-md-10">
+                    <div class="col-md-12 offset-md-1">
                         <div class="form-inline ">
                             <div class="form-group mr-3">
                                 <label for="categoria" class="d-block">Categoria:</label>
                                 <select class="form-control" id="categoria">
-                                    <option value="">Todos</option>
+                                    <option value="">--Seleccione una opción--</option>
                                     <?php while ($categoria = sqlsrv_fetch_array($sql_categoria)) { ?>
                                         <option value="<?= $categoria['id_categoria'] ?>"><?= $categoria['nombre'] ?></option>
                                     <?php } ?>
                                 </select>
                             </div>
                             <div class="form-group mr-3">
-                                <label for="estado" class="d-block">Estado:</label>
-                                <select class="form-control" id="estado">
-                                    <option value="">Todos</option>
-                                    <?php while ($estado = sqlsrv_fetch_array($sql_estado)) { ?>
-                                        <option value="<?= $estado['id_tipo_estado'] ?>"><?= $estado['nombre'] ?></option>
+                                <label for="asesor" class="d-block">Asesor:</label>
+                                <select class="form-control" id="asesor">
+                                    <option value="">--Seleccione una opción--</option>
+                                    <?php while ($asesor = sqlsrv_fetch_array($sql_asesor)) { ?>
+                                        <option value="<?= $asesor['id_asesor'] ?>"><?= $asesor['nombre'] ?></option>
                                     <?php } ?>
-                                </select>
-                            </div>
-                            <div class="form-group mr-3">
-                                <label for="plaza" class="d-block">Plaza:</label>
-                                <select class="form-control" id="plaza">
-                                    <option value="">Todos</option>
-                                    <?php while ($plaza = sqlsrv_fetch_array($sql_plaza)) { ?>
-                                        <option value="<?= $plaza['id_plaza'] ?>"><?= $plaza['nombre'] ?></option>
-                                    <?php } ?>
-                                </select>
-                            </div>
-                            <div class="form-group mr-3">
-                                <label for="usuario" class="d-block">Usuario:</label>
-                                <select class="form-control" id="usuario">
-                                    <option value="">Todos</option>
-                                    <?php while ($usuario = sqlsrv_fetch_array($sql_usuario)) { ?>
-                                        <option value="<?= $usuario['id_usuario'] ?>"><?= $usuario['nombre'] ?></option>
-                                    <?php } ?>
-                                </select>
-                            </div>
-                            <div class="form-group mr-3">
-                                <label for="subcategoria" class="d-block">Subcategoria:</label>
-                                <select class="form-control" id="subcategoria">
-                                    <option value="">Todos</option>
-                                    
                                 </select>
                             </div>
                             <div class="form-group mr-3">
@@ -128,19 +95,6 @@ group by p.id_plaza,p.nombre
                             <div class="form-group mr-3">
                                 <a id="filterIconLink" title="Resetear filtros"><img class="filterIcon" width="48" height="48" src="https://img.icons8.com/fluency/48/filter--v2.png" alt="filter--v2" /></a>
                             </div>
-                            
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="info-box">
-                            <span class="info-box-icon bg-info elevation-1"><i class="fa-solid fa-ticket"></i></span>
-                            <div class="info-box-content">
-                                <span class="info-box-text">Tickets</span>
-                                <span class="info-box-number" id="tickets">
-
-                                </span>
-                            </div>
-                            <!-- /.info-box-content -->
                         </div>
                     </div>
                 </div>
@@ -150,7 +104,7 @@ group by p.id_plaza,p.nombre
 
                 <!-- /.row -->
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                         <!-- PIE CHART -->
                         <div class="card card-danger">
                             <div class="card-header">
@@ -167,26 +121,12 @@ group by p.id_plaza,p.nombre
                             <!-- /.card-body -->
                         </div>
                         <!-- /.card -->
-                        <div class="card card-info">
-                            <div class="card-header">
-                                <h3 class="card-title">Tickets por subcategoria</h3>
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                        <i class="fa-solid fa-minus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <canvas id="subcategoriaChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                            </div>
-                            <!-- /.card-body -->
-                        </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                         <!-- PIE CHART -->
                         <div class="card card-success">
                             <div class="card-header">
-                                <h3 class="card-title">Tickets por estado</h3>
+                                <h3 class="card-title">Tickets por asesor</h3>
                                 <div class="card-tools">
                                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                         <i class="fa-solid fa-minus"></i>
@@ -194,13 +134,74 @@ group by p.id_plaza,p.nombre
                                 </div>
                             </div>
                             <div class="card-body">
-                                <canvas id="estadoChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                <canvas id="asesorChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                             </div>
                             <!-- /.card-body -->
                         </div>
                         <!-- /.card -->
                     </div>
-                    
+                    <div class="col-md-2">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-info elevation-1"><i class="fa-solid fa-ticket"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Tickets</span>
+                                <span class="info-box-number" id="tickets">
+
+                                </span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <div class="info-box">
+                            <span class="info-box-icon bg-success elevation-1"><i class="fa-solid fa-check-double"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Finalizado</span>
+                                <span class="info-box-number" id="finalizado">
+
+                                </span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <div class="info-box">
+                            <span class="info-box-icon bg-primary elevation-1"><i class="fa-solid fa-gear"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">En proceso</span>
+                                <span class="info-box-number" id="proceso">
+
+                                </span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <div class="info-box">
+                            <span class="info-box-icon bg-warning elevation-1"><i class="fa-regular fa-hourglass-half"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Pendientes</span>
+                                <span class="info-box-number" id="pendiente">
+
+                                </span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <div class="info-box">
+                            <span class="info-box-icon bg-secondary elevation-1"><i class="fa-solid fa-list-check"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Validando</span>
+                                <span class="info-box-number" id="validando">
+
+                                </span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <div class="info-box">
+                            <span class="info-box-icon bg-light  elevation-1"><i class="fa-solid fa-rotate-left"></i></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Recurrente</span>
+                                <span class="info-box-number" id="recurrente">
+
+                                </span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                    </div>
                 </div>
                 <!-- /.row -->
             </div><!-- /.container-fluid -->
