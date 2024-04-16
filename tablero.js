@@ -18,7 +18,7 @@ function llenarSelectSubcategorias(subcategorias, subcategoriaSeleccionada) {
   selectSubcategoria.appendChild(optionTodos);
 
   // Iterar sobre las subcategorías y agregarlas como opciones al select
-  subcategorias.forEach(function(subcategoria) {
+  subcategorias.forEach(function (subcategoria) {
     var option = document.createElement("option");
     option.value = subcategoria.id;
     option.text = subcategoria.nombre;
@@ -31,7 +31,16 @@ function llenarSelectSubcategorias(subcategorias, subcategoriaSeleccionada) {
   });
 }
 
-function updateChart(rangof, estado, categoria, subcategoria, usuario, plaza) {
+function updateChart(
+  rangof,
+  estado,
+  categoria,
+  subcategoria,
+  usuario,
+  plaza,
+  medio,
+  area
+) {
   $.ajax({
     url: "consulta.php",
     type: "POST",
@@ -42,6 +51,8 @@ function updateChart(rangof, estado, categoria, subcategoria, usuario, plaza) {
       subcategoria: subcategoria,
       usuario: usuario,
       plaza: plaza,
+      medio: medio,
+      area: area,
     },
     dataType: "json",
     success: function (data) {
@@ -55,7 +66,7 @@ function updateChart(rangof, estado, categoria, subcategoria, usuario, plaza) {
       if (subcategoriaChart) {
         subcategoriaChart.destroy();
       }
-      llenarSelectSubcategorias(data.filtro_subcategoria,subcategoria);
+      llenarSelectSubcategorias(data.filtro_subcategoria, subcategoria);
       // Crear la nueva gráfica
       var pieChartCanvas = $("#pieChart").get(0).getContext("2d");
       pieChart = new Chart(pieChartCanvas, {
@@ -70,9 +81,10 @@ function updateChart(rangof, estado, categoria, subcategoria, usuario, plaza) {
       estadoChart = new Chart(estadoChartCanvas, {
         type: "bar",
         data: data.estados,
-        
       });
-      var subcategoriaChartCanvas = $("#subcategoriaChart").get(0).getContext("2d");
+      var subcategoriaChartCanvas = $("#subcategoriaChart")
+        .get(0)
+        .getContext("2d");
       subcategoriaChart = new Chart(subcategoriaChartCanvas, {
         type: "horizontalBar",
         data: data.subcategorias,
@@ -80,18 +92,17 @@ function updateChart(rangof, estado, categoria, subcategoria, usuario, plaza) {
 
       // Actualizar los valores de los spans
       $("#tickets").text(data.count);
-     
     },
     error: function (xhr, status, error) {
       console.error(xhr.responseText);
       // Manejar el error de la solicitud AJAX
       alert(
-        "Error al actualizar los datos. Por favor, inténtalo de nuevo más tarde."+error
+        "Error al actualizar los datos. Por favor, inténtalo de nuevo más tarde." +
+          error
       );
     },
   });
 }
-
 
 $(function () {
   // Inicializar los valores de asesor y categoría
@@ -101,18 +112,56 @@ $(function () {
   var subcategoria = $("#subcategoria").val();
   var usuario = $("#usuario").val();
   var plaza = $("#plaza").val();
+  var medio = $("#medio").val();
+  var area = $("#area").val();
 
   // Llamar a la función updateChart al cargar la página
-  updateChart(rangof, estado, categoria, subcategoria, usuario, plaza);
+  updateChart(
+    rangof,
+    estado,
+    categoria,
+    subcategoria,
+    usuario,
+    plaza,
+    medio,
+    area
+  );
 
   // Agregar evento de cambio para el selector de asesor
   $("#estado").change(function () {
     rangof = $("#rangof").val();
     categoria = $("#categoria").val();
+    subcategoria = $("#subcategoria").val();
     usuario = $("#usuario").val();
-  plaza = $("#plaza").val();
+    plaza = $("#plaza").val();
     estado = $(this).val();
-    updateChart(rangof, estado, categoria, "", usuario, plaza);
+    medio = $("#medio").val();
+    area = $("#area").val();
+    updateChart(rangof, estado, categoria, subcategoria, usuario, plaza, medio, area);
+  });
+
+  $("#medio").change(function () {
+    rangof = $("#rangof").val();
+    categoria = $("#categoria").val();
+    subcategoria = $("#subcategoria").val();
+    usuario = $("#usuario").val();
+    plaza = $("#plaza").val();
+    medio = $(this).val();
+    estado = $("#estado").val();
+    area = $("#area").val();
+    updateChart(rangof, estado, categoria, subcategoria, usuario, plaza, medio, area);
+  });
+
+  $("#area").change(function () {
+    rangof = $("#rangof").val();
+    categoria = $("#categoria").val();
+    subcategoria = $("#subcategoria").val();
+    usuario = $("#usuario").val();
+    plaza = $("#plaza").val();
+    area = $(this).val();
+    medio = $("#medio").val();
+    estado = $("#estado").val();
+    updateChart(rangof, estado, categoria, subcategoria, usuario, plaza, medio, area);
   });
 
   // Agregar evento de cambio para el selector de categoría
@@ -121,18 +170,22 @@ $(function () {
     estado = $("#estado").val();
     subcategoria = $("#subcategoria").val();
     usuario = $("#usuario").val();
-  plaza = $("#plaza").val();
+    plaza = $("#plaza").val();
     categoria = $(this).val();
-    updateChart(rangof, estado, categoria, "", usuario, plaza);
+    medio = $("#medio").val();
+    area = $("#area").val();
+    updateChart(rangof, estado, categoria, "", usuario, plaza, medio, area);
   });
   $("#usuario").change(function () {
     rangof = $("#rangof").val();
     estado = $("#estado").val();
     subcategoria = $("#subcategoria").val();
     categoria = $("#categoria").val();
-  plaza = $("#plaza").val();
+    plaza = $("#plaza").val();
     usuario = $(this).val();
-    updateChart(rangof, estado, categoria, "", usuario, plaza);
+    medio = $("#medio").val();
+    area = $("#area").val();
+    updateChart(rangof, estado, categoria, subcategoria, usuario, plaza, medio, area);
   });
   $("#plaza").change(function () {
     rangof = $("#rangof").val();
@@ -141,27 +194,34 @@ $(function () {
     usuario = $("#usuario").val();
     categoria = $("#categoria").val();
     plaza = $(this).val();
-    updateChart(rangof, estado, categoria, "", usuario, plaza);
+    medio = $("#medio").val();
+    area = $("#area").val();
+    updateChart(rangof, estado, categoria, subcategoria, usuario, plaza, medio, area);
   });
   $("#subcategoria").change(function () {
     rangof = $("#rangof").val();
     estado = $("#estado").val();
     categoria = $("#categoria").val();
     usuario = $("#usuario").val();
-  plaza = $("#plaza").val();
+    plaza = $("#plaza").val();
     subcategoria = $(this).val();
-    updateChart(rangof, estado, categoria, subcategoria, usuario, plaza);
+    medio = $("#medio").val();
+    area = $("#area").val();
+    updateChart(rangof, estado, categoria, subcategoria, usuario, plaza, medio, area);
   });
+
   $("#filterIconLink").on("click", function () {
     document.getElementById("categoria").selectedIndex = 0;
     document.getElementById("estado").selectedIndex = 0;
     document.getElementById("subcategoria").selectedIndex = 0;
     document.getElementById("usuario").selectedIndex = 0;
     document.getElementById("plaza").selectedIndex = 0;
+    document.getElementById("medio").selectedIndex = 0;
+    document.getElementById("area").selectedIndex = 0;
 
     // Establecer el valor del input con id "rangof" como vacío
     document.getElementById("rangof").value = "";
-    updateChart("", "", "", "", "", "");
+    updateChart("", "", "", "", "", "", "", "");
   });
   $(document).ready(function () {
     $("#reporte").on("click", function () {
@@ -220,8 +280,10 @@ $(function () {
     categoria = $("#categoria").val();
     subcategoria = $("#subcategoria").val();
     usuario = $("#usuario").val();
-  plaza = $("#plaza").val();
-    updateChart(fecha, estado, categoria, subcategoria, usuario, plaza);
+    plaza = $("#plaza").val();
+    medio = $("#medio").val();
+    area = $("#area").val();
+    updateChart(fecha, estado, categoria, subcategoria, usuario, plaza,medio,area);
   });
 
   $('input[id="rangof"]').on("cancel.daterangepicker", function (ev, picker) {
@@ -231,6 +293,8 @@ $(function () {
     subcategoria = $("#subcategoria").val();
     usuario = $("#usuario").val();
     plaza = $("#plaza").val();
-    updateChart("", estado, categoria, subcategoria, usuario, plaza);
+    medio = $("#medio").val();
+    area = $("#area").val();
+    updateChart("", estado, categoria, subcategoria, usuario, plaza, medio, area);
   });
 });

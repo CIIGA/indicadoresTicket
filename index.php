@@ -16,6 +16,13 @@ $sql_plaza = sqlsrv_query($cnx, "select p.id_plaza,p.nombre from ticket as t
 inner join plaza as p on t.id_plaza=p.id_plaza where t.estatus <> 1
 group by p.id_plaza,p.nombre
 ");
+$sql_tipo_medio = sqlsrv_query($cnx, "select tm.id_tipo_medio,tm.nombre from ticket as t
+inner join tipo_medio as tm on t.id_tipo_medio=tm.id_tipo_medio where t.estatus <> 1
+group by tm.id_tipo_medio,tm.nombre
+");
+$sql_areaCategoria = sqlsrv_query($cnx, "select distinct areaCategoria from ticket as t
+where t.estatus <> 1
+");
 
 
 ?>
@@ -35,7 +42,7 @@ group by p.id_plaza,p.nombre
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
-        <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui/material-ui.css" id="theme-styles">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui/material-ui.css" id="theme-styles">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <style>
         /* Estilos para el icono */
@@ -76,8 +83,8 @@ group by p.id_plaza,p.nombre
                     <div class="col-md-10">
                         <div class="form-inline ">
                             <div class="form-group mr-3">
-                                <label for="categoria" class="d-block">Categoria:</label>
-                                <select class="form-control" id="categoria">
+                                <label for="categoria" class="d-block">Area:</label>
+                                <select class="form-control form-control-sm" id="categoria">
                                     <option value="">Todos</option>
                                     <?php while ($categoria = sqlsrv_fetch_array($sql_categoria)) { ?>
                                         <option value="<?= $categoria['id_categoria'] ?>"><?= $categoria['nombre'] ?></option>
@@ -86,7 +93,7 @@ group by p.id_plaza,p.nombre
                             </div>
                             <div class="form-group mr-3">
                                 <label for="estado" class="d-block">Estado:</label>
-                                <select class="form-control" id="estado">
+                                <select class="form-control form-control-sm" id="estado">
                                     <option value="">Todos</option>
                                     <?php while ($estado = sqlsrv_fetch_array($sql_estado)) { ?>
                                         <option value="<?= $estado['id_tipo_estado'] ?>"><?= $estado['nombre'] ?></option>
@@ -95,7 +102,7 @@ group by p.id_plaza,p.nombre
                             </div>
                             <div class="form-group mr-3">
                                 <label for="plaza" class="d-block">Plaza:</label>
-                                <select class="form-control" id="plaza">
+                                <select class="form-control form-control-sm" id="plaza">
                                     <option value="">Todos</option>
                                     <?php while ($plaza = sqlsrv_fetch_array($sql_plaza)) { ?>
                                         <option value="<?= $plaza['id_plaza'] ?>"><?= $plaza['nombre'] ?></option>
@@ -104,7 +111,7 @@ group by p.id_plaza,p.nombre
                             </div>
                             <div class="form-group mr-3">
                                 <label for="usuario" class="d-block">Usuario:</label>
-                                <select class="form-control" id="usuario">
+                                <select class="form-control form-control-sm" id="usuario">
                                     <option value="">Todos</option>
                                     <?php while ($usuario = sqlsrv_fetch_array($sql_usuario)) { ?>
                                         <option value="<?= $usuario['id_usuario'] ?>"><?= $usuario['nombre'] ?></option>
@@ -112,15 +119,35 @@ group by p.id_plaza,p.nombre
                                 </select>
                             </div>
                             <div class="form-group mr-3">
-                                <label for="subcategoria" class="d-block">Subcategoria:</label>
-                                <select class="form-control" id="subcategoria">
+                                <label for="medio" class="d-block">Medio:</label>
+                                <select class="form-control form-control-sm" id="medio">
                                     <option value="">Todos</option>
-                                    
+                                    <?php while ($medio = sqlsrv_fetch_array($sql_tipo_medio)) { ?>
+                                        <option value="<?= $medio['id_tipo_medio'] ?>"><?= $medio['nombre'] ?></option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                            <div class="form-group mr-3">
+                                <label for="area" class="d-block">Categoria:</label>
+                                <select class="form-control form-control-sm" id="area">
+                                    <option value="">Todos</option>
+                                    <?php while ($area = sqlsrv_fetch_array($sql_areaCategoria)) { ?>
+                                        <option value="<?= empty($area['areaCategoria']) ? 'vacio' : $area['areaCategoria']?>">
+                                            <?= empty($area['areaCategoria']) ? 'Vacío' : $area['areaCategoria'] ?>
+                                        </option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                            <div class="form-group mr-3">
+                                <label for="subcategoria" class="d-block">Subcategoria:</label>
+                                <select class="form-control form-control-sm" id="subcategoria">
+                                    <option value="">Todos</option>
+
                                 </select>
                             </div>
                             <div class="form-group mr-3">
                                 <label for="rangof" class="d-block">Fechas:</label>
-                                <input type="text" class="form-control" id="rangof" value="" />
+                                <input type="text" class="form-control form-control-sm" id="rangof" value="" />
                             </div>
                             <div class="form-group mr-3">
                                 <button class="btn btn-primary" id="reporte">Reporte</button>
@@ -128,7 +155,7 @@ group by p.id_plaza,p.nombre
                             <div class="form-group mr-3">
                                 <a id="filterIconLink" title="Resetear filtros"><img class="filterIcon" width="48" height="48" src="https://img.icons8.com/fluency/48/filter--v2.png" alt="filter--v2" /></a>
                             </div>
-                            
+
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -200,7 +227,7 @@ group by p.id_plaza,p.nombre
                         </div>
                         <!-- /.card -->
                     </div>
-                    
+
                 </div>
                 <!-- /.row -->
             </div><!-- /.container-fluid -->

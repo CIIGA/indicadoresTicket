@@ -7,6 +7,8 @@ $categoria = $_POST['categoria'];
 $subcategoria = $_POST['subcategoria'];
 $usuario = $_POST['usuario'];
 $plaza = $_POST['plaza'];
+$medio = $_POST['medio'];
+$area = $_POST['area'];
 
 $sql_filtro_subcategoria = "select sub.id_subcategoria,sub.nombre from ticket as t
 inner join subcategoria as sub on t.id_subcategoria=sub.id_subcategoria
@@ -42,6 +44,25 @@ if (!empty($estado)) {
     $sql_subcategoria .= " AND t.id_tipo_estado = '$estado'";
     $sql_estado .= " AND t.id_tipo_estado = '$estado'";
     $sql_count .= " AND t.id_tipo_estado = '$estado'";
+}
+if (!empty($medio)) {
+    $sql_categoria .= " AND t.id_tipo_medio = '$medio'";
+    $sql_subcategoria .= " AND t.id_tipo_medio = '$medio'";
+    $sql_estado .= " AND t.id_tipo_medio = '$medio'";
+    $sql_count .= " AND t.id_tipo_medio = '$medio'";
+}
+if (!empty($area)) {
+    if ($area == 'vacio') {
+        $sql_categoria .= " AND t.areaCategoria = ''";
+        $sql_subcategoria .= " AND t.areaCategoria = ''";
+        $sql_estado .= " AND t.areaCategoria = ''";
+        $sql_count .= " AND t.areaCategoria = ''";
+    } else {
+        $sql_categoria .= " AND t.areaCategoria = '$area'";
+        $sql_subcategoria .= " AND t.areaCategoria = '$area'";
+        $sql_estado .= " AND t.areaCategoria = '$area'";
+        $sql_count .= " AND t.areaCategoria = '$area'";
+    }
 }
 if (!empty($usuario)) {
     $sql_categoria .= " AND t.id_usuario = '$usuario'";
@@ -114,7 +135,7 @@ while ($filtro_sub = sqlsrv_fetch_array($resultado_filtro_subcategoria)) {
 }
 while ($subcategoria = sqlsrv_fetch_array($resultado_subcategoria)) {
     $subcategorias[] = utf8_encode($subcategoria['nombre']); // o utf8_decode
-        $c_subcategorias[] = $subcategoria['cantidad'];
+    $c_subcategorias[] = $subcategoria['cantidad'];
 }
 
 while ($array_estado = sqlsrv_fetch_array($resultado_estado)) {
@@ -124,7 +145,8 @@ while ($array_estado = sqlsrv_fetch_array($resultado_estado)) {
 
 
 
-function generarColorAleatorio() {
+function generarColorAleatorio()
+{
     return '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
 }
 
